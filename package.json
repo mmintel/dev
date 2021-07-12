@@ -10,8 +10,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@apollo/client": "^3.3.21",
     "@next-auth/prisma-adapter": "^0.5.2",
     "@prisma/client": "^2.26.0",
+    "graphql": "^15.5.1",
     "next": "11.0.1",
     "next-auth": "^3.27.3",
     "prisma": "2.26.0",

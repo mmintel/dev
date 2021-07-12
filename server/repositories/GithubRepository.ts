@@ -1,4 +1,8 @@
+import { ApolloClient, gql } from "@apollo/client";
+
 export class GithubRepository {
+  constructor(private graphqlClient: ApolloClient<any>) {}
+
   async getProfile(username: string) {
     const request = await fetch(`https://api.github.com/users/${username}`, {
       method: "GET",
@@ -48,5 +52,39 @@ export class GithubRepository {
       language: repo.language,
       homepage: repo.homepage,
     }));
+  }
+
+  async getContributions(username: string, token: string) {
+    const request = await this.graphqlClient.query({
+      variables: { username },
+      context: {
+        headers: {
+          Authorization: `token ${token}`,
+        },
+      },
+      query: gql`
+        query GithubContributionsQuery($username: String) {
+          user(login: $username) {
+            name
+            contributionsCollection {
+              contributionCalendar {
+                colors
+                totalContributions
+                weeks {
+                  contributionDays {
+                    color
+                    contributionCount
+                    date
+                    weekday
+                  }
+                  firstDay
+                }
+              }
+            }
+          }
+        }
+      `,
+    });
+    console.log(request);
   }
 }

@@ -12,9 +12,16 @@ interface Props {
 }
 
 const Home: React.FC<Props> = ({ profiles }) => {
+  const handleRefresh = async () => {
+    await fetch("/api/refresh-profile", {
+      method: "POST",
+    });
+  };
+
   return (
     <Layout>
       <main>
+        <button onClick={handleRefresh}>refresh profile</button>
         {profiles.map((profile) => (
           <div key={profile.id}>
             <Link href={`/${profile.owner.username}`}>

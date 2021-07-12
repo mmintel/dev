@@ -10,7 +10,7 @@ const profileHandler: NextApiHandler = async (req, res) => {
 
   const userProfile = await getUserProfileUseCase.execute(username);
 
-  return res.json(userProfile);
+  res.json(userProfile);
 };
 
 export default profileHandler;

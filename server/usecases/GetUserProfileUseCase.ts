@@ -1,17 +1,9 @@
-import { GithubRepository } from "../repositories/GithubRepository";
+import { UserRepository } from "../repositories/UserRepository";
 
 export class GetUserProfileUseCase {
-  constructor(private githubRepository: GithubRepository) {}
+  constructor(private userRepository: UserRepository) {}
 
   async execute(username: string) {
-    const githubProfile = await this.githubRepository.getProfile(username);
-    const githubRepos = await this.githubRepository.getRepos(username);
-
-    return {
-      github: {
-        profile: githubProfile,
-        repos: githubRepos,
-      },
-    };
+    return this.userRepository.findByUsernameWithProfile(username);
   }
 }
