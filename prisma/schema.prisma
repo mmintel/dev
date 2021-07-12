@@ -24,11 +24,13 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  github        Github?   @relation(fields: [githubId], references: [id])
   profile       Profile?
   accounts      Account[]
   sessions      Session[]
   role          Role      @default(USER)
 
+  githubId String?
   @@map(name: "users")
 }
 
@@ -47,18 +49,50 @@ model Github {
   location    String?
   company     String?
   hireable    Boolean?
-  profile     Profile?
+  User        User[]
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  likes       Int
+  comments    Int
+  url         String
+  provider    String
+  createdAt   DateTime @default(now())
+  feed        Feed     @relation(fields: [feedId], references: [id])
+  feedId      String
+}
+
+model Repo {
+  id        String   @id @default(cuid())
+  title     String
+  stars     Int
+  forks     Int
+  url       String
+  provider  String
+  createdAt DateTime @default(now())
+  feed      Feed     @relation(fields: [feedId], references: [id])
+  feedId    String
+}
+
+model Feed {
+  id      String    @id @default(cuid())
+  posts   Post[]
+  repos   Repo[]
+  Profile Profile[]
 }
 
 model Profile {
   id        String   @id @default(cuid())
   published Boolean  @default(false)
-  github    Github?  @relation(fields: [githubId], references: [id])
+  feed      Feed     @relation(fields: [feedId], references: [id])
   owner     User?    @relation(fields: [ownerId], references: [id])
   ownerId   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  githubId  String
+  feedId    String
 }
 
 model Account {
