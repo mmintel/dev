@@ -15,6 +15,15 @@ enum Role {
   ADMIN
 }
 
+enum PostProvider {
+  medium
+  dev
+}
+
+enum RepoProvider {
+  github
+}
+
 model User {
   id            String    @id @default(cuid())
   username      String?   @unique
@@ -53,35 +62,34 @@ model Github {
 }
 
 model Post {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   title       String
   description String
   likes       Int
   comments    Int
-  url         String
-  provider    String
-  createdAt   DateTime @default(now())
-  feed        Feed     @relation(fields: [feedId], references: [id])
+  provider    PostProvider
+  feed        Feed         @relation(fields: [feedId], references: [id])
   feedId      String
 }
 
 model Repo {
-  id        String   @id @default(cuid())
-  title     String
-  stars     Int
-  forks     Int
-  url       String
-  provider  String
-  createdAt DateTime @default(now())
-  feed      Feed     @relation(fields: [feedId], references: [id])
-  feedId    String
+  id       String       @id @default(cuid())
+  title    String
+  stars    Int
+  forks    Int
+  provider RepoProvider
+  feed     Feed         @relation(fields: [feedId], references: [id])
+  feedId   String
 }
 
 model Feed {
-  id      String    @id @default(cuid())
-  posts   Post[]
-  repos   Repo[]
-  Profile Profile[]
+  id        String   @id @default(cuid())
+  visible   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  url       String
+  Post      Post[]
+  Repo      Repo[]
+  Profile   Profile?
 }
 
 model Profile {
