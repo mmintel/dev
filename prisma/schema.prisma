@@ -33,7 +33,6 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  github        Github?   @relation(fields: [githubId], references: [id])
   profile       Profile?
   accounts      Account[]
   sessions      Session[]
@@ -43,43 +42,39 @@ model User {
   @@map(name: "users")
 }
 
-model Github {
-  id          String   @unique
-  accessToken String
-  login       String
-  name        String
-  followers   Int
-  following   Int
-  publicRepos Int
-  publicGists Int
-  url         String
-  avatarUrl   String?
-  blog        String?
-  location    String?
-  company     String?
-  hireable    Boolean?
-  User        User[]
+model GithubAccount {
+  id             String   @unique
+  accessToken    String
+  login          String
+  name           String
+  followersCount Int
+  followingCount Int
+  reposCount     Int
+  gistsCount     Int
+  url            String
+  Profile        Profile?
 }
 
 model Post {
   id          String       @id @default(cuid())
   title       String
   description String
-  likes       Int
-  comments    Int
+  likes       Int          @default(0)
+  comments    Int          @default(0)
   provider    PostProvider
   feed        Feed         @relation(fields: [feedId], references: [id])
   feedId      String
 }
 
 model Repo {
-  id       String       @id @default(cuid())
-  title    String
-  stars    Int
-  forks    Int
-  provider RepoProvider
-  feed     Feed         @relation(fields: [feedId], references: [id])
-  feedId   String
+  id          String       @id @default(cuid())
+  title       String
+  stars       Int          @default(0)
+  forks       Int          @default(0)
+  provider    RepoProvider
+  homepageUrl String?
+  feed        Feed         @relation(fields: [feedId], references: [id])
+  feedId      String
 }
 
 model Feed {
@@ -93,14 +88,20 @@ model Feed {
 }
 
 model Profile {
-  id        String   @id @default(cuid())
-  published Boolean  @default(false)
-  feed      Feed     @relation(fields: [feedId], references: [id])
-  owner     User?    @relation(fields: [ownerId], references: [id])
-  ownerId   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  feedId    String
+  id              String        @id @default(cuid())
+  isHireable      Boolean
+  company         String?
+  location        String?
+  homepageUrl     String?
+  github          GithubAccount @relation(fields: [githubAccountId], references: [id])
+  published       Boolean       @default(false)
+  feed            Feed          @relation(fields: [feedId], references: [id])
+  user            User?         @relation(fields: [userId], references: [id])
+  userId          String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  feedId          String
+  githubAccountId String
 }
 
 model Account {

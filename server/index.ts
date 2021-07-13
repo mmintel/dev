@@ -1,16 +1,16 @@
 import prisma from "../lib/prisma";
-import { githubClient } from "./http/githubClient";
+import { githubGraphqlClient } from "./http/githubGraphqlClient";
 import { GithubRepository } from "./repositories/GithubRepository";
 import { UserRepository } from "./repositories/UserRepository";
 import { GetUserProfileUseCase } from "./usecases/GetUserProfileUseCase";
 import { RefreshUserProfileUseCase } from "./usecases/RefreshUserProfileUseCase";
 
-const githubRepository = new GithubRepository(githubClient);
+const githubRepository = new GithubRepository(githubGraphqlClient);
 const userRepository = new UserRepository(prisma);
 
 export const refreshUserProfileUseCase = new RefreshUserProfileUseCase(
-  userRepository,
-  githubRepository
+  githubRepository,
+  userRepository
 );
 
 export const getUserProfileUseCase = new GetUserProfileUseCase(userRepository);

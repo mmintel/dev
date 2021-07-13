@@ -16,10 +16,20 @@ export class UserRepository {
     return user;
   }
 
-  async findAccountByUserName(username: string) {
+  async findUserByToken(token: string) {
+    const account = await this.client.account.findFirst({
+      where: { accessToken: token },
+    });
+    const user = await this.client.user.findUnique({
+      where: { id: account.userId },
+    });
+    return user;
+  }
+
+  async findAccountByUsername(username: string) {
     const user = await this.findByUsername(username);
-    const account = await this.client.account.findUnique({
-      where: { id: user.id },
+    const account = await this.client.account.findFirst({
+      where: { userId: user.id },
     });
     return account;
   }

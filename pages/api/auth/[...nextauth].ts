@@ -5,6 +5,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "../../../lib/prisma";
 import { Prisma, User } from "@prisma/client";
 import { refreshUserProfileUseCase } from "../../../server";
+import { githubGraphqlClient } from "../../../server/http/githubGraphqlClient";
 
 const options: NextAuthOptions = {
   providers: [
@@ -24,9 +25,21 @@ const options: NextAuthOptions = {
   ],
   adapter: PrismaAdapter(prisma),
   secret: process.env.SECRET,
+  callbacks: {
+    async session(session, user: User) {
+      const account = await prisma.account.findFirst({
+        where: { userId: user.id },
+      });
+      session.user = user;
+      githubGraphqlClient.setHeader(
+        "Authorization",
+        `token ${account.accessToken}`
+      );
+      return session;
+    },
+  },
   events: {
     async createUser(user: User) {
-      console.info("Creating user:", user);
       await refreshUserProfileUseCase.execute(user.username);
     },
   },

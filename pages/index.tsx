@@ -7,7 +7,7 @@ import prisma from "../lib/prisma";
 
 interface Props {
   profiles: (Profile & {
-    owner: Pick<User, "username" | "image">;
+    user: Pick<User, "username" | "image">;
   })[];
 }
 
@@ -24,10 +24,10 @@ const Home: React.FC<Props> = ({ profiles }) => {
         <button onClick={handleRefresh}>refresh profile</button>
         {profiles.map((profile) => (
           <div key={profile.id}>
-            <Link href={`/${profile.owner.username}`}>
+            <Link href={`/${profile.user.username}`}>
               <a>
-                <Image src={profile.owner.image} width={100} height={100} />
-                {profile.owner.username}
+                <Image src={profile.user.image} width={100} height={100} />
+                {profile.user.username}
               </a>
             </Link>
           </div>
@@ -41,9 +41,9 @@ export default Home;
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   const profiles = await prisma.profile.findMany({
-    where: { owner: { username: { not: null } } },
+    where: { user: { username: { not: null } } },
     include: {
-      owner: {
+      user: {
         select: {
           username: true,
           image: true,

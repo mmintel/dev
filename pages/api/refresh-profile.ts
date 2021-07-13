@@ -11,8 +11,6 @@ const refreshProfileHandler: NextApiHandler = async (req, res) => {
 
   const session = await getSession({ req });
 
-  console.log("session", session);
-
   if (session) {
     await refreshUserProfileUseCase.execute(session.user.username);
     res.status(200);
