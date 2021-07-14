@@ -1,11 +1,13 @@
 import { gql, GraphQLClient } from "graphql-request";
+import { GithubRepoDTO } from "../dtos/GithubRepoDTO";
+import { GithubUserDTO } from "../dtos/GithubUserDTO";
 import { GithubRepositoryFragment } from "../graphql/GithubRepositoryFragment";
 import { GithubUserFragment } from "../graphql/GithubUserFragment";
 
 export class GithubRepository {
   constructor(private graphqlClient: GraphQLClient) {}
 
-  async getProfile(username: string) {
+  async getUser(username: string): Promise<GithubUserDTO> {
     const request = await this.graphqlClient.request(
       gql`
         query GithubContributionsQuery($username: String!) {
@@ -20,7 +22,7 @@ export class GithubRepository {
     return request.user;
   }
 
-  async getRepos(username: string) {
+  async getRepos(username: string): Promise<GithubRepoDTO[]> {
     const request = await this.graphqlClient.request(
       gql`
         query GithubContributionsQuery($username: String!) {

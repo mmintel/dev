@@ -1,9 +1,10 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../../lib/prisma";
-import { UserProfileNotFoundError } from "../errors/UserProfileNotFoundError";
+import { UserProfileAlreadyExistsError } from "../errors/UserProfileAlreadyExistsError";
 import { GithubRepository } from "../repositories/GithubRepository";
 import { UserRepository } from "../repositories/UserRepository";
 
-export class RefreshUserProfileUseCase {
+export class CreateUserProfileUseCase {
   constructor(
     private githubRepository: GithubRepository,
     private userRepository: UserRepository
@@ -17,19 +18,19 @@ export class RefreshUserProfileUseCase {
       where: { user: { username } },
     });
 
-    if (!profile) {
-      throw new UserProfileNotFoundError();
+    if (profile) {
+      throw new UserProfileAlreadyExistsError();
     }
 
-    await prisma.profile.update({
-      where: { id: profile.id },
+    await prisma.profile.create({
       data: {
+        user: { connect: { username } },
         company: githubProfile.company,
         location: githubProfile.location,
         homepageUrl: githubProfile.blog,
         isHireable: githubProfile.isHireable,
         github: {
-          update: {
+          create: {
             id: githubProfile.id,
             followersCount: githubProfile.followers.totalCount,
             followingCount: githubProfile.following.totalCount,
@@ -41,10 +42,9 @@ export class RefreshUserProfileUseCase {
             accessToken: account.accessToken,
           },
         },
+        feed: {},
       },
     });
-
-    // TODO make sure repos are not overwritten, probably split github repo from domain repo
 
     for (const repo of githubRepos) {
       await prisma.feed.create({

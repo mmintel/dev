@@ -9,6 +9,8 @@ export const GithubUserFragment = gql`
     isHireable
     avatarUrl
     bio
+    blog
+    url
     company
     email
     followers {
