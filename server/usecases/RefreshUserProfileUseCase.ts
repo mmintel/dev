@@ -1,71 +1,39 @@
-import prisma from "../../lib/prisma";
+import { UseCase } from "../domain/UseCase";
 import { UserProfileNotFoundError } from "../errors/UserProfileNotFoundError";
 import { GithubRepository } from "../repositories/GithubRepository";
 import { UserRepository } from "../repositories/UserRepository";
 
-export class RefreshUserProfileUseCase {
+export class RefreshUserProfileUseCase implements UseCase {
   constructor(
     private githubRepository: GithubRepository,
     private userRepository: UserRepository
   ) {}
 
   async execute(username: string) {
-    const account = await this.userRepository.findAccountByUsername(username);
     const githubProfile = await this.githubRepository.getUser(username);
-    const githubRepos = await this.githubRepository.getRepos(username);
-    const profile = await prisma.profile.findFirst({
-      where: { user: { username } },
-    });
+    const profile = await this.userRepository.findProfileByUsername(username);
 
     if (!profile) {
       throw new UserProfileNotFoundError();
     }
 
-    await prisma.profile.update({
-      where: { id: profile.id },
-      data: {
+    await this.userRepository.updateUserProfile(profile.id, {
+      profile: {
         company: githubProfile.company,
         location: githubProfile.location,
         homepageUrl: githubProfile.blog,
         isHireable: githubProfile.isHireable,
-        github: {
-          update: {
-            id: githubProfile.id,
-            followersCount: githubProfile.followers.totalCount,
-            followingCount: githubProfile.following.totalCount,
-            gistsCount: githubProfile.gists.totalCount,
-            reposCount: githubProfile.repositories.totalCount,
-            login: githubProfile.login,
-            name: githubProfile.name,
-            url: githubProfile.url,
-            accessToken: account.accessToken,
-          },
-        },
+      },
+      github: {
+        id: githubProfile.id,
+        followersCount: githubProfile.followers.totalCount,
+        followingCount: githubProfile.following.totalCount,
+        gistsCount: githubProfile.gists.totalCount,
+        reposCount: githubProfile.repositories.totalCount,
+        login: githubProfile.login,
+        name: githubProfile.name,
+        url: githubProfile.url,
       },
     });
-
-    // TODO make sure repos are not overwritten, probably split github repo from domain repo
-
-    for (const repo of githubRepos) {
-      await prisma.feed.create({
-        data: {
-          url: repo.url,
-          Profile: {
-            connect: {
-              id: profile.id,
-            },
-          },
-          Repo: {
-            create: {
-              title: repo.name,
-              stars: repo.stargazerCount,
-              forks: repo.forkCount,
-              provider: "github",
-              id: repo.id,
-            },
-          },
-        },
-      });
-    }
   }
 }

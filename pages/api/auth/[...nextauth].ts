@@ -4,7 +4,6 @@ import Providers from "next-auth/providers";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "../../../lib/prisma";
 import { Prisma, User } from "@prisma/client";
-import { refreshUserProfileUseCase } from "../../../server";
 import { githubGraphqlClient } from "../../../server/http/githubGraphqlClient";
 
 const options: NextAuthOptions = {
@@ -12,7 +11,7 @@ const options: NextAuthOptions = {
     Providers.GitHub({
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
-      profile(profile): any {
+      profile(profile, tokens): any {
         return {
           id: profile.id.toString(),
           username: profile.login,
@@ -36,11 +35,6 @@ const options: NextAuthOptions = {
         `token ${account.accessToken}`
       );
       return session;
-    },
-  },
-  events: {
-    async createUser(user: User) {
-      await refreshUserProfileUseCase.execute(user.username);
     },
   },
 };

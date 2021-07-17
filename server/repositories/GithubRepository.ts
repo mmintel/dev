@@ -10,7 +10,7 @@ export class GithubRepository {
   async getUser(username: string): Promise<GithubUserDTO> {
     const request = await this.graphqlClient.request(
       gql`
-        query GithubContributionsQuery($username: String!) {
+        query GithubUserQuery($username: String!) {
           user(login: $username) {
             ...GithubUserFragment
           }
@@ -25,7 +25,7 @@ export class GithubRepository {
   async getRepos(username: string): Promise<GithubRepoDTO[]> {
     const request = await this.graphqlClient.request(
       gql`
-        query GithubContributionsQuery($username: String!) {
+        query GithubRepoQuery($username: String!) {
           user(login: $username) {
             repositories(
               first: 10
