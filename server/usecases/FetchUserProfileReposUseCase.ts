@@ -1,5 +1,3 @@
-import { Prisma } from "@prisma/client";
-import prisma from "../../lib/prisma";
 import { UseCase } from "../domain/UseCase";
 import { UserProfileNotFoundError } from "../errors/UserProfileNotFoundError";
 import { GithubRepository } from "../repositories/GithubRepository";

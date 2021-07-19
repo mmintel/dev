@@ -1,5 +1,3 @@
-import { Prisma } from "@prisma/client";
-import prisma from "../../lib/prisma";
 import { UserProfileAlreadyExistsError } from "../errors/UserProfileAlreadyExistsError";
 import { GithubRepository } from "../repositories/GithubRepository";
 import { UserRepository } from "../repositories/UserRepository";
@@ -14,6 +12,10 @@ export class CreateUserProfileUseCase {
     const account = await this.userRepository.findAccountByUsername(username);
     const githubProfile = await this.githubRepository.getUser(username);
     const profile = await this.userRepository.findProfileByUsername(username);
+
+    console.info(`Creating user profile for user "${username}"...`);
+    console.info(githubProfile);
+    console.info(profile);
 
     if (profile) {
       throw new UserProfileAlreadyExistsError();
@@ -38,5 +40,7 @@ export class CreateUserProfileUseCase {
         accessToken: account.accessToken,
       },
     });
+
+    console.info(`Successfully created profile for "${username}"!`);
   }
 }

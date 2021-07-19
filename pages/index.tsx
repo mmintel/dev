@@ -51,5 +51,5 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       },
     },
   });
-  return { props: { profiles } };
+  return { props: { profiles: profiles || [] } };
 };

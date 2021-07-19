@@ -74,9 +74,8 @@ export class UserRepository implements IUserRepository {
   }
 
   async findAccountByUsername(username: string) {
-    const user = await this.findByUsername(username);
     const account = await this.client.account.findFirst({
-      where: { userId: user.id },
+      where: { user: { username } },
     });
     return account;
   }

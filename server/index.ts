@@ -21,11 +21,15 @@ export const refreshUserProfileUseCase = new RefreshUserProfileUseCase(
 
 export const getUserProfileUseCase = new GetUserProfileUseCase(userRepository);
 
-// TODO find better place for hooks
-prisma.$use(async (params, next) => {
-  if (params.model === "User" && params.action === "create") {
-    console.log("params for create user hook", params);
-    await createUserProfileUseCase.execute(params.args.username);
-  }
-  next(params);
-});
+// TODO find better place
+export const subscribeToPrisma = () => {
+  prisma.$use(async (params, next) => {
+    console.log("HOOK FIRED", params);
+    if (params.model === "User" && params.action === "create") {
+      console.log("params for create user hook", params);
+      await createUserProfileUseCase.execute(params.args.data.username);
+    }
+    const result = await next(params);
+    return result;
+  });
+};
