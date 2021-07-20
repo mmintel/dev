@@ -1,10 +1,12 @@
-import prisma from "../lib/prisma";
+import { createPrismaClient } from "./lib/createPrismaClient";
 import { githubGraphqlClient } from "./http/githubGraphqlClient";
 import { GithubRepository } from "./repositories/GithubRepository";
 import { UserRepository } from "./repositories/UserRepository";
 import { CreateUserProfileUseCase } from "./usecases/CreateUserProfileUseCase";
 import { GetUserProfileUseCase } from "./usecases/GetUserProfileUseCase";
 import { RefreshUserProfileUseCase } from "./usecases/RefreshUserProfileUseCase";
+
+const prisma = createPrismaClient();
 
 const githubRepository = new GithubRepository(githubGraphqlClient);
 const userRepository = new UserRepository(prisma);
@@ -21,15 +23,15 @@ export const refreshUserProfileUseCase = new RefreshUserProfileUseCase(
 
 export const getUserProfileUseCase = new GetUserProfileUseCase(userRepository);
 
-// TODO find better place
-export const subscribeToPrisma = () => {
-  prisma.$use(async (params, next) => {
-    console.log("HOOK FIRED", params);
-    if (params.model === "User" && params.action === "create") {
-      console.log("params for create user hook", params);
-      await createUserProfileUseCase.execute(params.args.data.username);
-    }
-    const result = await next(params);
-    return result;
-  });
-};
+prisma.$use(async (params, next) => {
+  console.log("HOOK FIRED", params);
+  const result = await next(params);
+  if (params.model === "Account" && params.action === "create") {
+    console.log("params for create account hook", params);
+    await createUserProfileUseCase.execute(params.args.data.userId);
+  }
+  return result;
+});
+
+// TODO eliminate all direct usages of prisma
+export { prisma };

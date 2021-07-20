@@ -8,20 +8,21 @@ export class CreateUserProfileUseCase {
     private userRepository: UserRepository
   ) {}
 
-  async execute(username: string) {
-    const account = await this.userRepository.findAccountByUsername(username);
-    const githubProfile = await this.githubRepository.getUser(username);
-    const profile = await this.userRepository.findProfileByUsername(username);
-
-    console.info(`Creating user profile for user "${username}"...`);
-    console.info(githubProfile);
-    console.info(profile);
+  async execute(userId: string) {
+    const user = await this.userRepository.findById(userId);
+    const account = await this.userRepository.findAccountByUsername(
+      user.username
+    );
+    const githubProfile = await this.githubRepository.getUser(user.username);
+    const profile = await this.userRepository.findProfileByUsername(
+      user.username
+    );
 
     if (profile) {
       throw new UserProfileAlreadyExistsError();
     }
 
-    await this.userRepository.createUserProfile(username, {
+    await this.userRepository.createUserProfile(user.username, {
       profile: {
         company: githubProfile.company,
         location: githubProfile.location,
@@ -41,6 +42,6 @@ export class CreateUserProfileUseCase {
       },
     });
 
-    console.info(`Successfully created profile for "${username}"!`);
+    console.info(`Successfully created profile for "${user.username}"!`);
   }
 }

@@ -1,4 +1,4 @@
-import { UseCase } from "../domain/UseCase";
+import { UseCase } from "../core/UseCase";
 import { UserProfileNotFoundError } from "../errors/UserProfileNotFoundError";
 import { GithubRepository } from "../repositories/GithubRepository";
 import { UserRepository } from "../repositories/UserRepository";

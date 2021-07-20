@@ -2,7 +2,7 @@ import { Profile, User } from "@prisma/client";
 import { GetServerSideProps } from "next";
 import { Layout } from "../components/Layout";
 import Image from "next/image";
-import prisma from "../lib/prisma";
+import { prisma } from "../server";
 
 interface Props {
   profile: Profile & {

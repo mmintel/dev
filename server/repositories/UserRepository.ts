@@ -1,11 +1,4 @@
-import {
-  Account,
-  Feed,
-  Prisma,
-  PrismaClient,
-  Profile,
-  User,
-} from "@prisma/client";
+import { Account, Prisma, PrismaClient, Profile, User } from "@prisma/client";
 
 export type CreateProfileInput = Omit<
   Prisma.ProfileCreateInput,
@@ -49,6 +42,10 @@ export interface IUserRepository {
 
 export class UserRepository implements IUserRepository {
   constructor(private client: PrismaClient) {}
+
+  async findById(userId: string) {
+    return this.client.user.findUnique({ where: { id: userId } });
+  }
 
   async findByUsername(username: string) {
     return this.client.user.findUnique({ where: { username } });

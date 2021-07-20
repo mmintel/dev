@@ -2,7 +2,7 @@ import { NextApiHandler } from "next";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import Providers from "next-auth/providers";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import prisma from "../../../lib/prisma";
+import { prisma } from "../../../server";
 import { Prisma, User } from "@prisma/client";
 import { githubGraphqlClient } from "../../../server/http/githubGraphqlClient";
 

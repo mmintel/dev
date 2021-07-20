@@ -3,7 +3,7 @@ import { GetStaticProps } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Layout } from "../components/Layout";
-import prisma from "../lib/prisma";
+import { prisma } from "../server";
 
 interface Props {
   profiles: (Profile & {
